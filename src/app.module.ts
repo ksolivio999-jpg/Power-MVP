@@ -3,6 +3,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { getDatabaseConfig } from './config/database.config';
+
+// Import all feature modules
+import { UsersModule } from './modules/users/users.module';
+import { ProjectsModule } from './modules/projects/projects.module';
+import { FloorsModule } from './modules/floors/floors.module';
+import { PanelsModule } from './modules/panels/panels.module';
+import { BreakersModule } from './modules/breakers/breakers.module';
+import { CircuitsModule } from './modules/circuits/circuits.module';
 
 @Module({
   imports: [
@@ -16,18 +25,16 @@ import { AppService } from './app.service';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get('NODE_ENV') === 'development',
-        logging: true,
-      }),
+      useFactory: getDatabaseConfig,
     }),
+
+    // Feature modules
+    UsersModule,
+    ProjectsModule,
+    FloorsModule,
+    PanelsModule,
+    BreakersModule,
+    CircuitsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -9,6 +9,9 @@ async function bootstrap() {
   // Get config service
   const configService = app.get(ConfigService);
   const port = configService.get('PORT') || 3000;
+  console.log("DB_HOST ==>", configService.get('DB_HOST'));
+  
+
   await app.listen(port);
   console.log(`🚀 Application is running on: http://localhost:${port}/api`);
 
