@@ -12,7 +12,7 @@ export class AppController {
 
   @Get('test-db')
   testDatabase() {
-    return this.appService.getHello();
-    // return this.appService.testDatabase();
+    // return this.appService.getHello();
+    return this.appService.testDatabase();
   }
 }
