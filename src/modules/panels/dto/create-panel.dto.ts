@@ -1,36 +1,44 @@
-import { IsString, IsUUID, IsInt, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID, IsInt, MaxLength, Min, IsUrl } from 'class-validator';
 
 export class CreatePanelDto {
+  @IsNotEmpty()
   @IsUUID()
   projectId: string;
 
+  @IsNotEmpty()
   @IsUUID()
   floorId: string;
 
-  @IsUUID()
   @IsOptional()
+  @IsUUID()
   parentPanelId?: string;
 
+  @IsNotEmpty()
   @IsString()
+  @MaxLength(255)
   name: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
+  @MaxLength(255)
   location?: string;
 
-  @IsInt()
   @IsOptional()
+  @IsInt()
+  @Min(1)
   totalSpaces?: number;
 
-  @IsString()
   @IsOptional()
+  @IsUrl()
+  @MaxLength(500)
   photoUrl?: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
+  @MaxLength(100)
   qrSlug?: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   notes?: string;
 }

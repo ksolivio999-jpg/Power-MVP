@@ -11,6 +11,6 @@ export const getDatabaseConfig = (
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_DATABASE'),
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: configService.get('NODE_ENV') === 'development',
+  synchronize: true, // Temporarily enabled to create tables
   logging: true,
 });

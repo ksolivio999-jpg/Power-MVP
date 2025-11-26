@@ -19,29 +19,41 @@ export class FloorsService {
 
   async findAll(): Promise<Floor[]> {
     return await this.floorRepository.find({
-      relations: ['project', 'panels'],
+      order: { orderIndex: 'ASC', createdAt: 'DESC' },
     });
   }
 
   async findOne(id: string): Promise<Floor> {
     const floor = await this.floorRepository.findOne({
       where: { id },
-      relations: ['project', 'panels'],
     });
+    
     if (!floor) {
       throw new NotFoundException(`Floor with ID ${id} not found`);
     }
+    
     return floor;
   }
 
   async update(id: string, updateFloorDto: UpdateFloorDto): Promise<Floor> {
     const floor = await this.findOne(id);
+    
     Object.assign(floor, updateFloorDto);
     return await this.floorRepository.save(floor);
   }
 
   async remove(id: string): Promise<void> {
-    const floor = await this.findOne(id);
-    await this.floorRepository.remove(floor);
+    const result = await this.floorRepository.delete(id);
+    
+    if (result.affected === 0) {
+      throw new NotFoundException(`Floor with ID ${id} not found`);
+    }
+  }
+
+  async findByProject(projectId: string): Promise<Floor[]> {
+    return await this.floorRepository.find({
+      where: { projectId },
+      order: { orderIndex: 'ASC', createdAt: 'DESC' },
+    });
   }
 }

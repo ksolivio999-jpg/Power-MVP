@@ -1,17 +1,20 @@
-import { IsString, IsUUID, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class CreateProjectDto {
+  @IsNotEmpty()
   @IsUUID()
   userId: string;
 
+  @IsNotEmpty()
   @IsString()
+  @MaxLength(255)
   name: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   address?: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   notes?: string;
 }

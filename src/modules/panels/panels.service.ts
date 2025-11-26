@@ -19,29 +19,60 @@ export class PanelsService {
 
   async findAll(): Promise<Panel[]> {
     return await this.panelRepository.find({
-      relations: ['project', 'floor', 'breakers', 'subpanels'],
+      order: { createdAt: 'DESC' },
     });
   }
 
   async findOne(id: string): Promise<Panel> {
     const panel = await this.panelRepository.findOne({
       where: { id },
-      relations: ['project', 'floor', 'breakers', 'subpanels', 'parentPanel'],
     });
+    
     if (!panel) {
       throw new NotFoundException(`Panel with ID ${id} not found`);
     }
+    
     return panel;
   }
 
   async update(id: string, updatePanelDto: UpdatePanelDto): Promise<Panel> {
     const panel = await this.findOne(id);
+    
     Object.assign(panel, updatePanelDto);
     return await this.panelRepository.save(panel);
   }
 
   async remove(id: string): Promise<void> {
-    const panel = await this.findOne(id);
-    await this.panelRepository.remove(panel);
+    const result = await this.panelRepository.delete(id);
+    
+    if (result.affected === 0) {
+      throw new NotFoundException(`Panel with ID ${id} not found`);
+    }
+  }
+
+  async findByProject(projectId: string): Promise<Panel[]> {
+    return await this.panelRepository.find({
+      where: { projectId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findByFloor(floorId: string): Promise<Panel[]> {
+    return await this.panelRepository.find({
+      where: { floorId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findByQrSlug(qrSlug: string): Promise<Panel> {
+    const panel = await this.panelRepository.findOne({
+      where: { qrSlug },
+    });
+    
+    if (!panel) {
+      throw new NotFoundException(`Panel with QR slug ${qrSlug} not found`);
+    }
+    
+    return panel;
   }
 }

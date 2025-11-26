@@ -19,29 +19,41 @@ export class ProjectsService {
 
   async findAll(): Promise<Project[]> {
     return await this.projectRepository.find({
-      relations: ['floors', 'panels'],
+      order: { createdAt: 'DESC' },
     });
   }
 
   async findOne(id: string): Promise<Project> {
     const project = await this.projectRepository.findOne({
       where: { id },
-      relations: ['floors', 'panels'],
     });
+    
     if (!project) {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
+    
     return project;
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto): Promise<Project> {
     const project = await this.findOne(id);
+    
     Object.assign(project, updateProjectDto);
     return await this.projectRepository.save(project);
   }
 
   async remove(id: string): Promise<void> {
-    const project = await this.findOne(id);
-    await this.projectRepository.remove(project);
+    const result = await this.projectRepository.delete(id);
+    
+    if (result.affected === 0) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+  }
+
+  async findByUser(userId: string): Promise<Project[]> {
+    return await this.projectRepository.find({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
   }
 }

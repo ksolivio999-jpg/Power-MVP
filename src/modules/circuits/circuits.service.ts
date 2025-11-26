@@ -19,29 +19,48 @@ export class CircuitsService {
 
   async findAll(): Promise<Circuit[]> {
     return await this.circuitRepository.find({
-      relations: ['breaker'],
+      order: { createdAt: 'DESC' },
     });
   }
 
   async findOne(id: string): Promise<Circuit> {
     const circuit = await this.circuitRepository.findOne({
       where: { id },
-      relations: ['breaker'],
     });
+    
     if (!circuit) {
       throw new NotFoundException(`Circuit with ID ${id} not found`);
     }
+    
     return circuit;
   }
 
   async update(id: string, updateCircuitDto: UpdateCircuitDto): Promise<Circuit> {
     const circuit = await this.findOne(id);
+    
     Object.assign(circuit, updateCircuitDto);
     return await this.circuitRepository.save(circuit);
   }
 
   async remove(id: string): Promise<void> {
-    const circuit = await this.findOne(id);
-    await this.circuitRepository.remove(circuit);
+    const result = await this.circuitRepository.delete(id);
+    
+    if (result.affected === 0) {
+      throw new NotFoundException(`Circuit with ID ${id} not found`);
+    }
+  }
+
+  async findByBreaker(breakerId: string): Promise<Circuit[]> {
+    return await this.circuitRepository.find({
+      where: { breakerId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findDedicated(): Promise<Circuit[]> {
+    return await this.circuitRepository.find({
+      where: { isDedicated: true },
+      order: { createdAt: 'DESC' },
+    });
   }
 }

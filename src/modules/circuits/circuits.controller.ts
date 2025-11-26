@@ -6,6 +6,10 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  HttpStatus,
+  HttpCode,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { CircuitsService } from './circuits.service';
 import { CreateCircuitDto } from './dto/create-circuit.dto';
@@ -16,27 +20,67 @@ export class CircuitsController {
   constructor(private readonly circuitsService: CircuitsService) {}
 
   @Post()
-  create(@Body() createCircuitDto: CreateCircuitDto) {
-    return this.circuitsService.create(createCircuitDto);
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() createCircuitDto: CreateCircuitDto) {
+    const circuit = await this.circuitsService.create(createCircuitDto);
+    return {
+      success: true,
+      message: 'Circuit created successfully',
+      data: circuit,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.circuitsService.findAll();
+  async findAll(
+    @Query('breakerId') breakerId?: string,
+    @Query('dedicated') dedicated?: string
+  ) {
+    let circuits;
+    if (breakerId) {
+      circuits = await this.circuitsService.findByBreaker(breakerId);
+    } else if (dedicated === 'true') {
+      circuits = await this.circuitsService.findDedicated();
+    } else {
+      circuits = await this.circuitsService.findAll();
+    }
+    
+    return {
+      success: true,
+      message: 'Circuits retrieved successfully',
+      data: circuits,
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.circuitsService.findOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const circuit = await this.circuitsService.findOne(id);
+    return {
+      success: true,
+      message: 'Circuit retrieved successfully',
+      data: circuit,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCircuitDto: UpdateCircuitDto) {
-    return this.circuitsService.update(id, updateCircuitDto);
+  async update(
+    @Param('id', ParseUUIDPipe) id: string, 
+    @Body() updateCircuitDto: UpdateCircuitDto
+  ) {
+    const circuit = await this.circuitsService.update(id, updateCircuitDto);
+    return {
+      success: true,
+      message: 'Circuit updated successfully',
+      data: circuit,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.circuitsService.remove(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    await this.circuitsService.remove(id);
+    return {
+      success: true,
+      message: 'Circuit deleted successfully',
+    };
   }
 }

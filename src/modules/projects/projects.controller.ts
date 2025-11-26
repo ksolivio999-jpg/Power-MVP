@@ -6,6 +6,10 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  HttpStatus,
+  HttpCode,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -16,27 +20,59 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(createProjectDto);
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() createProjectDto: CreateProjectDto) {
+    const project = await this.projectsService.create(createProjectDto);
+    return {
+      success: true,
+      message: 'Project created successfully',
+      data: project,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.projectsService.findAll();
+  async findAll(@Query('userId') userId?: string) {
+    const projects = userId 
+      ? await this.projectsService.findByUser(userId)
+      : await this.projectsService.findAll();
+    
+    return {
+      success: true,
+      message: 'Projects retrieved successfully',
+      data: projects,
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const project = await this.projectsService.findOne(id);
+    return {
+      success: true,
+      message: 'Project retrieved successfully',
+      data: project,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.update(id, updateProjectDto);
+  async update(
+    @Param('id', ParseUUIDPipe) id: string, 
+    @Body() updateProjectDto: UpdateProjectDto
+  ) {
+    const project = await this.projectsService.update(id, updateProjectDto);
+    return {
+      success: true,
+      message: 'Project updated successfully',
+      data: project,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    await this.projectsService.remove(id);
+    return {
+      success: true,
+      message: 'Project deleted successfully',
+    };
   }
 }

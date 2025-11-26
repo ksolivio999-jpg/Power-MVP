@@ -1,25 +1,29 @@
-import { IsString, IsUUID, IsBoolean, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID, IsBoolean, MaxLength } from 'class-validator';
 
 export class CreateCircuitDto {
+  @IsNotEmpty()
   @IsUUID()
   breakerId: string;
 
+  @IsNotEmpty()
   @IsString()
+  @MaxLength(255)
   name: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
+  @MaxLength(255)
   room?: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   loadDescription?: string;
 
+  @IsOptional()
   @IsBoolean()
-  @IsOptional()
-  isDedicated?: boolean;
+  isDedicated?: boolean = false;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   notes?: string;
 }
