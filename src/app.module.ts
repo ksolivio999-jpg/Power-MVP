@@ -7,6 +7,7 @@ import { getDatabaseConfig } from './config/database.config';
 
 // Import all feature modules
 import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { FloorsModule } from './modules/floors/floors.module';
 import { PanelsModule } from './modules/panels/panels.module';
@@ -30,6 +31,7 @@ import { CircuitsModule } from './modules/circuits/circuits.module';
 
     // Feature modules
     UsersModule,
+    AuthModule,
     ProjectsModule,
     FloorsModule,
     PanelsModule,
